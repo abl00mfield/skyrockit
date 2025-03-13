@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 //embedded relationship, must refer to parent
 const User = require("../models/user.js");
+const req = require("express/lib/request.js");
 
 //by the time the application gets to this point, we are already
 //at /users/:userId/applicaitons
@@ -53,5 +54,19 @@ router.get("/:applicationId", async (req, res) => {
     res.redirect("/");
   }
 });
+
+router.delete("/:applicationId", async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.session.user._id);
+    currentUser.applications.id(req.params.applicationId).deleteOne();
+    await currentUser.save();
+    res.redirect(`/users/${currentUser._id}/applications`);
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
+router.get("/applicationId/edit", async(req, res));
 
 module.exports = router;
