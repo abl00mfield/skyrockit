@@ -35,4 +35,23 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/:applicationId", async (req, res) => {
+  try {
+    //look up user
+    const currentUser = await User.findById(req.session.user._id);
+    //find the subdocument in the currently logged in user's applications list
+    const application = await currentUser.applications.id(
+      req.params.applicationId
+    );
+    //render a show template with the subdocument details
+    res.render("applications/show.ejs", {
+      application, //property shorthand syntax - we don't have to say application:application
+      //property name and variable name that are the same, you only have to put the name once
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
 module.exports = router;
